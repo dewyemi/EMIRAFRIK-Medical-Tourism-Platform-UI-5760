@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useLanguage } from '../contexts/LanguageContext';
+import { SERVED_COUNTRIES, COUNTRY_GROUPS } from '../utils/countries';
 
 const { FiFilter, FiHeart, FiEye, FiBrain, FiActivity, FiMapPin, FiStar, FiCheck } = FiIcons;
 
@@ -26,8 +27,17 @@ const PackageSelectionPage = () => {
       price: '$25,000',
       duration: '7-10 days',
       rating: 4.9,
-      features: ['Pre-operative consultation', 'Surgery', 'Post-operative care', '24/7 monitoring'],
-      tourism: ['Burj Khalifa visit', 'Dubai Mall shopping', 'Desert safari'],
+      features: [
+        'Pre-operative consultation',
+        'Surgery',
+        'Post-operative care',
+        '24/7 monitoring'
+      ],
+      tourism: [
+        'Burj Khalifa visit',
+        'Dubai Mall shopping',
+        'Desert safari'
+      ],
       image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop'
     },
     {
@@ -40,8 +50,16 @@ const PackageSelectionPage = () => {
       price: '$8,000',
       duration: '3-5 days',
       rating: 4.8,
-      features: ['LASIK surgery', 'Follow-up consultations', 'Medication included'],
-      tourism: ['Dubai Marina cruise', 'Gold Souk visit', 'Traditional dinner'],
+      features: [
+        'LASIK surgery',
+        'Follow-up consultations',
+        'Medication included'
+      ],
+      tourism: [
+        'Dubai Marina cruise',
+        'Gold Souk visit',
+        'Traditional dinner'
+      ],
       image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=250&fit=crop'
     },
     {
@@ -54,8 +72,16 @@ const PackageSelectionPage = () => {
       price: '$35,000',
       duration: '14-21 days',
       rating: 4.9,
-      features: ['Comprehensive diagnosis', 'Advanced treatment', 'Rehabilitation program'],
-      tourism: ['Abu Dhabi city tour', 'Sheikh Zayed Mosque', 'Louvre Abu Dhabi'],
+      features: [
+        'Comprehensive diagnosis',
+        'Advanced treatment',
+        'Rehabilitation program'
+      ],
+      tourism: [
+        'Abu Dhabi city tour',
+        'Sheikh Zayed Mosque',
+        'Louvre Abu Dhabi'
+      ],
       image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&h=250&fit=crop'
     }
   ];
@@ -117,7 +143,6 @@ const PackageSelectionPage = () => {
             <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-600" />
             <h2 className="text-lg font-semibold text-black">Filters</h2>
           </div>
-          
           <div className="grid md:grid-cols-4 gap-4">
             <select
               value={filters.budget}
@@ -145,8 +170,13 @@ const PackageSelectionPage = () => {
               className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent"
             >
               <option value="">All Countries</option>
-              <option value="UAE">UAE</option>
-              <option value="Saudi Arabia">Saudi Arabia</option>
+              {COUNTRY_GROUPS.map(group => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.countries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
 
             <label className="flex items-center space-x-2 px-4 py-3 border border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50">
@@ -172,11 +202,7 @@ const PackageSelectionPage = () => {
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
               <div className="relative">
-                <img
-                  src={pkg.image}
-                  alt={pkg.title}
-                  className="w-full h-48 object-cover"
-                />
+                <img src={pkg.image} alt={pkg.title} className="w-full h-48 object-cover" />
                 <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center space-x-1">
                   <SafeIcon icon={FiStar} className="w-4 h-4 text-yellow-400" />
                   <span className="text-sm font-medium">{pkg.rating}</span>

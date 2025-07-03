@@ -9,6 +9,7 @@ import AdminOverview from '../components/admin/AdminOverview';
 import ClientPipeline from '../components/admin/ClientPipeline';
 import ChatCopilot from '../components/admin/ChatCopilot';
 import WorkflowAutomation from '../components/admin/WorkflowAutomation';
+import UserRoleManagement from '../components/admin/UserRoleManagement';
 import UserProfile from '../components/shared/UserProfile';
 import PatientManagement from '../components/coordinator/PatientManagement';
 import JourneyTracking from '../components/coordinator/JourneyTracking';
@@ -26,15 +27,67 @@ import UserManagement from '../components/admin/UserManagement';
 import SystemAnalytics from '../components/admin/SystemAnalytics';
 
 const DashboardPage = () => {
-  const { profile, loading } = useAuth();
+  const { profile, loading, user, error } = useAuth();
+
+  console.log('🎯 DashboardPage state:', { 
+    user: user?.email, 
+    profile: profile?.role, 
+    loading, 
+    error 
+  });
 
   // Show loading while profile is being fetched
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-2 text-sm text-gray-500">
+            {user ? `Setting up profile for ${user.email}` : 'Authenticating...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if there's a connection issue
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 text-2xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Connection Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If no user, redirect to login
+  if (!user) {
+    console.log('❌ No user, redirecting to login');
+    return <Navigate to="/login" replace />;
+  }
+
+  // If no profile, show setup message
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Setting up your profile...</p>
+          <p className="mt-2 text-sm text-gray-500">
+            Welcome {user.email}, we're creating your account.
+          </p>
         </div>
       </div>
     );
@@ -54,24 +107,26 @@ const DashboardPage = () => {
     }
   };
 
+  console.log('✅ Rendering dashboard for role:', profile.role);
+
   return (
     <DashboardLayout>
       <Routes>
         {/* Default route redirects based on role */}
         <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
-        
+
         {/* Patient Routes */}
         <Route path="/patient" element={<PatientDashboard />} />
         <Route path="/medical-history" element={<MedicalHistory />} />
         <Route path="/documents" element={<Documents />} />
         <Route path="/payments" element={<Payments />} />
-        
+
         {/* Provider Routes */}
         <Route path="/provider" element={<ProviderDashboard />} />
         <Route path="/patients" element={<MyPatients />} />
         <Route path="/assessments" element={<Assessments />} />
         <Route path="/treatments" element={<Treatments />} />
-        
+
         {/* Coordinator Routes */}
         <Route path="/coordinator" element={<CoordinatorDashboard />} />
         <Route path="/patient-management" element={<PatientManagement />} />
@@ -79,19 +134,20 @@ const DashboardPage = () => {
         <Route path="/logistics" element={<TravelLogistics />} />
         <Route path="/communications" element={<Communications />} />
         <Route path="/analytics" element={<Analytics />} />
-        
+
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminOverview />} />
         <Route path="/user-management" element={<UserManagement />} />
+        <Route path="/user-roles" element={<UserRoleManagement />} />
         <Route path="/system-analytics" element={<SystemAnalytics />} />
         <Route path="/pipeline" element={<ClientPipeline />} />
         <Route path="/chat-copilot" element={<ChatCopilot />} />
         <Route path="/automation" element={<WorkflowAutomation />} />
-        
+
         {/* Shared Routes */}
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/profile" element={<UserProfile />} />
-        
+
         {/* Catch all */}
         <Route path="*" element={<Navigate to={getDefaultRoute()} replace />} />
       </Routes>

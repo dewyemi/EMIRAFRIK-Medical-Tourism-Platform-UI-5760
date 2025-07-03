@@ -4,6 +4,7 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../components/common/SafeIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import { SERVED_COUNTRIES, COUNTRY_GROUPS } from '../utils/countries';
 import supabase from '../lib/supabase';
 
 const { FiUser, FiGlobe, FiFileText, FiSend } = FiIcons;
@@ -18,29 +19,6 @@ const MedicalInquiryPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const countries = [
-    'United Arab Emirates',
-    'Saudi Arabia',
-    'Qatar',
-    'Kuwait',
-    'Bahrain',
-    'Oman',
-    'Morocco',
-    'Algeria',
-    'Tunisia',
-    'Senegal',
-    'Mali',
-    'Burkina Faso',
-    'Niger',
-    'Chad',
-    'Cameroon',
-    'Central African Republic',
-    'Gabon',
-    'Republic of the Congo',
-    'Democratic Republic of the Congo',
-    'Madagascar'
-  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -113,10 +91,7 @@ const MedicalInquiryPage = () => {
                   {t('fullName')} *
                 </label>
                 <div className="relative">
-                  <SafeIcon
-                    icon={FiUser}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                  />
+                  <SafeIcon icon={FiUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
                     name="fullName"
@@ -135,10 +110,7 @@ const MedicalInquiryPage = () => {
                   {t('country')} *
                 </label>
                 <div className="relative">
-                  <SafeIcon
-                    icon={FiGlobe}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
-                  />
+                  <SafeIcon icon={FiGlobe} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <select
                     name="country"
                     value={formData.country}
@@ -147,10 +119,12 @@ const MedicalInquiryPage = () => {
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all appearance-none bg-white"
                   >
                     <option value="">Select your country</option>
-                    {countries.map((country) => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
+                    {COUNTRY_GROUPS.map(group => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.countries.map(country => (
+                          <option key={country} value={country}>{country}</option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </div>
@@ -162,10 +136,7 @@ const MedicalInquiryPage = () => {
                   {t('healthCondition')} *
                 </label>
                 <div className="relative">
-                  <SafeIcon
-                    icon={FiFileText}
-                    className="absolute left-3 top-3 text-gray-400 w-5 h-5"
-                  />
+                  <SafeIcon icon={FiFileText} className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                   <textarea
                     name="healthCondition"
                     value={formData.healthCondition}

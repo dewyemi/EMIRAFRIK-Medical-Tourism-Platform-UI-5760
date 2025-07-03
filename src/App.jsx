@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthProvider, { useAuth } from './contexts/AuthContext';
@@ -23,9 +23,6 @@ import ChatPage from './pages/ChatPage';
 // Dashboard
 import DashboardPage from './pages/DashboardPage';
 
-// Admin
-import AdminDashboard from './pages/admin/AdminDashboard';
-
 // Chat Assistant
 import EnhancedChatAssistant from './components/chat/EnhancedChatAssistant';
 
@@ -37,13 +34,16 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/login" replace />;
 };
 
 // Public Route Component (redirect to dashboard if logged in)
@@ -52,13 +52,16 @@ const PublicRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  return !user ? children : <Navigate to="/dashboard" />;
+  return !user ? children : <Navigate to="/dashboard" replace />;
 };
 
 // Layout wrapper for public pages
@@ -80,70 +83,88 @@ const PublicLayout = ({ children }) => {
 function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <AnimatePresence mode="wait">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={
+      <Routes>
+        {/* Public Routes */}
+        <Route 
+          path="/" 
+          element={
             <PublicLayout>
               <HomePage />
             </PublicLayout>
-          } />
-          <Route path="/inquiry" element={
+          } 
+        />
+        <Route 
+          path="/inquiry" 
+          element={
             <PublicLayout>
               <MedicalInquiryPage />
             </PublicLayout>
-          } />
-          <Route path="/packages" element={
+          } 
+        />
+        <Route 
+          path="/packages" 
+          element={
             <PublicLayout>
               <PackageSelectionPage />
             </PublicLayout>
-          } />
-          <Route path="/payment" element={
+          } 
+        />
+        <Route 
+          path="/payment" 
+          element={
             <PublicLayout>
               <PaymentPage />
             </PublicLayout>
-          } />
-          <Route path="/aftercare" element={
+          } 
+        />
+        <Route 
+          path="/aftercare" 
+          element={
             <PublicLayout>
               <AftercarePage />
             </PublicLayout>
-          } />
-          <Route path="/chat" element={
+          } 
+        />
+        <Route 
+          path="/chat" 
+          element={
             <PublicLayout>
               <ChatPage />
             </PublicLayout>
-          } />
+          } 
+        />
 
-          {/* Auth Routes */}
-          <Route path="/login" element={
+        {/* Auth Routes */}
+        <Route 
+          path="/login" 
+          element={
             <PublicRoute>
               <LoginPage />
             </PublicRoute>
-          } />
-          <Route path="/register" element={
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
             <PublicRoute>
               <RegisterPage />
             </PublicRoute>
-          } />
+          } 
+        />
 
-          {/* Protected Routes */}
-          <Route path="/dashboard/*" element={
+        {/* Protected Routes */}
+        <Route 
+          path="/dashboard/*" 
+          element={
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
-          } />
+          } 
+        />
 
-          {/* Admin Routes */}
-          <Route path="/admin/*" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </AnimatePresence>
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }

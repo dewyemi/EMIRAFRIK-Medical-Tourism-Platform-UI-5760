@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
+import { SERVED_COUNTRIES, COUNTRY_GROUPS } from '../../utils/countries';
 
 const { FiUser, FiMail, FiLock, FiPhone, FiMapPin, FiUserCheck, FiHeart } = FiIcons;
 
@@ -22,7 +23,6 @@ const RegisterPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -39,17 +39,12 @@ const RegisterPage = () => {
     { value: 'nurse', label: 'Nurse' }
   ];
 
-  const countries = [
-    'United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'France',
-    'Spain', 'Italy', 'Netherlands', 'Belgium', 'Switzerland', 'Austria',
-    'UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain', 'Oman',
-    'India', 'Thailand', 'Singapore', 'Malaysia', 'South Korea', 'Japan',
-    'Morocco', 'Tunisia', 'Egypt', 'South Africa', 'Nigeria', 'Ghana'
-  ];
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -65,9 +60,8 @@ const RegisterPage = () => {
 
     try {
       const { data, error } = await signUp(formData.email, formData.password, formData);
-      
       if (error) throw error;
-      
+
       if (data.user) {
         navigate('/dashboard');
       }
@@ -220,8 +214,12 @@ const RegisterPage = () => {
                   className="pl-10 w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select your country</option>
-                  {countries.map(country => (
-                    <option key={country} value={country}>{country}</option>
+                  {COUNTRY_GROUPS.map(group => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.countries.map(country => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>

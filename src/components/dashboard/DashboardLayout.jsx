@@ -5,7 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
 
-const { FiMenu, FiX, FiLogOut, FiUser, FiBell, FiHome, FiUsers, FiCalendar, FiActivity, FiFileText, FiMapPin, FiCreditCard, FiSettings, FiBarChart3, FiMessageSquare, FiTruck, FiUserCheck, FiTrendingUp, FiClipboard, FiFolder, FiHeart } = FiIcons;
+const { FiMenu, FiX, FiLogOut, FiUser, FiBell, FiHome, FiUsers, FiCalendar, FiActivity, FiFileText, FiMapPin, FiCreditCard, FiSettings, FiBarChart3, FiMessageSquare, FiTruck, FiUserCheck, FiTrendingUp, FiClipboard, FiFolder, FiHeart, FiShield } = FiIcons;
 
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,14 +14,16 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
+      console.log('No user found, redirecting to login');
       navigate('/login');
     }
   }, [user, loading, navigate]);
 
+  // Redirect based on role when profile loads
   useEffect(() => {
-    // Redirect based on role when profile loads
     if (profile && location.pathname === '/dashboard') {
       console.log('Profile loaded, redirecting based on role:', profile.role);
       switch (profile.role) {
@@ -49,10 +51,6 @@ const DashboardLayout = ({ children }) => {
 
   const getNavigationItems = () => {
     if (!profile) return [];
-
-    const baseItems = [
-      { path: '/dashboard', label: 'Overview', icon: FiHome }
-    ];
 
     if (profile.role === 'patient') {
       return [
@@ -96,11 +94,12 @@ const DashboardLayout = ({ children }) => {
         { path: '/dashboard/pipeline', label: 'Client Pipeline', icon: FiUsers },
         { path: '/dashboard/chat-copilot', label: 'Chat & AI', icon: FiMessageSquare },
         { path: '/dashboard/automation', label: 'Automation', icon: FiSettings },
+        { path: '/dashboard/user-roles', label: 'Role Management', icon: FiShield },
         { path: '/dashboard/profile', label: 'Profile', icon: FiUser }
       ];
     }
 
-    return baseItems;
+    return [];
   };
 
   // Show loading spinner while authentication is being checked
@@ -127,6 +126,7 @@ const DashboardLayout = ({ children }) => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Setting up your profile...</p>
+          <p className="mt-2 text-sm text-gray-500">This may take a moment...</p>
         </div>
       </div>
     );
@@ -155,7 +155,9 @@ const DashboardLayout = ({ children }) => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={`w-full flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors ${
-                location.pathname === item.path ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : ''
+                location.pathname === item.path
+                  ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
+                  : ''
               }`}
             >
               <SafeIcon icon={item.icon} className="w-5 h-5" />
@@ -211,7 +213,10 @@ const DashboardLayout = ({ children }) => {
 
               {/* Profile Dropdown */}
               <div className="relative">
-                <button className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <button
+                  onClick={() => navigate('/dashboard/profile')}
+                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                     <SafeIcon icon={FiUser} className="w-4 h-4 text-white" />
                   </div>
@@ -239,7 +244,10 @@ const DashboardLayout = ({ children }) => {
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)}>
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50"
+          onClick={() => setSidebarOpen(false)}
+        >
           <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
             <div className="p-4">
               <div className="flex items-center justify-between">
@@ -267,7 +275,9 @@ const DashboardLayout = ({ children }) => {
                     setSidebarOpen(false);
                   }}
                   className={`w-full flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors ${
-                    location.pathname === item.path ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : ''
+                    location.pathname === item.path
+                      ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
+                      : ''
                   }`}
                 >
                   <SafeIcon icon={item.icon} className="w-5 h-5" />

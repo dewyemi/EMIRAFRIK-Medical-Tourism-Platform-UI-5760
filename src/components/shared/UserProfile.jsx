@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
+import { SERVED_COUNTRIES, COUNTRY_GROUPS } from '../../utils/countries';
 import supabase from '../../lib/supabase';
 
 const { FiUser, FiMail, FiPhone, FiMapPin, FiEdit, FiSave, FiX } = FiIcons;
@@ -135,9 +136,7 @@ const UserProfile = () => {
           </div>
 
           {message && (
-            <div className={`p-3 rounded-lg mb-4 ${
-              message.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-            }`}>
+            <div className={`p-3 rounded-lg mb-4 ${message.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
               {message}
             </div>
           )}
@@ -146,7 +145,7 @@ const UserProfile = () => {
         {/* Profile Information */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
-          
+
           <div className="space-y-6">
             {/* Basic Information */}
             <div className="grid md:grid-cols-2 gap-6">
@@ -208,13 +207,21 @@ const UserProfile = () => {
                   Country
                 </label>
                 {isEditing ? (
-                  <input
-                    type="text"
+                  <select
                     name="country"
                     value={formData.country}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Select your country</option>
+                    {COUNTRY_GROUPS.map(group => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.countries.map(country => (
+                          <option key={country} value={country}>{country}</option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
                 ) : (
                   <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
                     {profile?.country || 'Not provided'}
