@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
-import supabase from '../../lib/supabase';
 
 const { FiPlane, FiMapPin, FiCalendar, FiClock, FiUser, FiPhone, FiMail, FiEdit, FiPlus } = FiIcons;
 
@@ -22,23 +21,48 @@ const TravelLogistics = () => {
   const fetchTravelArrangements = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('patient_journeys_healthcare')
-        .select(`
-          *,
-          user_profiles_healthcare!patient_journeys_healthcare_patient_id_fkey(
-            full_name, email, phone_number, country
-          ),
-          treatment_options_healthcare(name),
-          healthcare_providers_healthcare(facility_name, location)
-        `)
-        .in('status', ['approved', 'travel_prep', 'in_treatment', 'recovery'])
-        .order('travel_date', { ascending: true });
+      
+      // Using mock data since the database tables don't exist yet
+      const mockArrangements = [
+        {
+          id: '1',
+          patient_name: 'Ahmed Hassan',
+          patient_email: 'ahmed.hassan@email.com',
+          patient_phone: '+212 6 12 34 56 78',
+          country: 'Morocco',
+          treatment_name: 'Cardiac Surgery',
+          facility_name: 'Dubai Heart Institute',
+          status: 'travel_prep',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          patient_name: 'Fatima Al-Zahra',
+          patient_email: 'fatima.alzahra@email.com',
+          patient_phone: '+221 77 123 45 67',
+          country: 'Senegal',
+          treatment_name: 'Eye Surgery',
+          facility_name: 'Emirates Eye Hospital',
+          status: 'in_treatment',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '3',
+          patient_name: 'Omar Diallo',
+          patient_email: 'omar.diallo@email.com',
+          patient_phone: '+223 65 12 34 56',
+          country: 'Mali',
+          treatment_name: 'Orthopedic Surgery',
+          facility_name: 'Dubai Orthopedic Center',
+          status: 'recovery',
+          created_at: new Date().toISOString()
+        }
+      ];
 
-      if (error) throw error;
-      setTravelArrangements(data || []);
+      setTravelArrangements(mockArrangements);
     } catch (error) {
       console.error('Error fetching travel arrangements:', error);
+      setTravelArrangements([]);
     } finally {
       setLoading(false);
     }
@@ -163,10 +187,10 @@ const TravelLogistics = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">
-                      {arrangement.user_profiles_healthcare?.full_name}
+                      {arrangement.patient_name}
                     </h3>
                     <p className="text-gray-600">
-                      {arrangement.treatment_options_healthcare?.name} at {arrangement.healthcare_providers_healthcare?.facility_name}
+                      {arrangement.treatment_name} at {arrangement.facility_name}
                     </p>
                     <div className="flex items-center space-x-4 mt-2">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(arrangement.status)}`}>
@@ -174,7 +198,7 @@ const TravelLogistics = () => {
                       </span>
                       <div className="flex items-center text-sm text-gray-500">
                         <SafeIcon icon={FiMapPin} className="w-4 h-4 mr-1" />
-                        {arrangement.user_profiles_healthcare?.country} → Dubai
+                        {arrangement.country} → Dubai
                       </div>
                     </div>
                   </div>
@@ -192,11 +216,11 @@ const TravelLogistics = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <SafeIcon icon={FiMail} className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{arrangement.user_profiles_healthcare?.email}</span>
+                  <span className="text-sm text-gray-600">{arrangement.patient_email}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <SafeIcon icon={FiPhone} className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{arrangement.user_profiles_healthcare?.phone_number || 'Not provided'}</span>
+                  <span className="text-sm text-gray-600">{arrangement.patient_phone}</span>
                 </div>
               </div>
 

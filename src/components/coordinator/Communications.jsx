@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
-import supabase from '../../lib/supabase';
 
 const { FiMessageSquare, FiMail, FiPhone, FiSend, FiUser, FiClock, FiCheck, FiAlertCircle } = FiIcons;
 
@@ -23,73 +22,128 @@ const Communications = () => {
   const fetchCommunications = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('communications_healthcare')
-        .select(`
-          *,
-          sender:user_profiles_healthcare!communications_healthcare_sender_id_fkey(full_name, role),
-          recipient:user_profiles_healthcare!communications_healthcare_recipient_id_fkey(full_name, role)
-        `)
-        .order('created_at', { ascending: false });
+      
+      // Using mock data since the database tables don't exist yet
+      const mockCommunications = [
+        {
+          id: '1',
+          participant: { id: '1', full_name: 'Ahmed Hassan', role: 'patient' },
+          messages: [
+            {
+              id: '1',
+              sender_id: '1',
+              recipient_id: profile.id,
+              message: 'Hello, I have some questions about my upcoming surgery.',
+              message_type: 'text',
+              created_at: new Date().toISOString(),
+              read_at: null
+            },
+            {
+              id: '2',
+              sender_id: profile.id,
+              recipient_id: '1',
+              message: 'Hi Ahmed! I\'d be happy to help you with any questions. What would you like to know?',
+              message_type: 'text',
+              created_at: new Date().toISOString(),
+              read_at: new Date().toISOString()
+            }
+          ],
+          lastMessage: {
+            id: '2',
+            message: 'Hi Ahmed! I\'d be happy to help you with any questions. What would you like to know?',
+            created_at: new Date().toISOString()
+          },
+          unreadCount: 0
+        },
+        {
+          id: '2',
+          participant: { id: '2', full_name: 'Fatima Al-Zahra', role: 'patient' },
+          messages: [
+            {
+              id: '3',
+              sender_id: '2',
+              recipient_id: profile.id,
+              message: 'Can you please confirm my travel arrangements?',
+              message_type: 'text',
+              created_at: new Date().toISOString(),
+              read_at: null
+            }
+          ],
+          lastMessage: {
+            id: '3',
+            message: 'Can you please confirm my travel arrangements?',
+            created_at: new Date().toISOString()
+          },
+          unreadCount: 1
+        },
+        {
+          id: '3',
+          participant: { id: '3', full_name: 'Dr. Sarah Johnson', role: 'provider' },
+          messages: [
+            {
+              id: '4',
+              sender_id: '3',
+              recipient_id: profile.id,
+              message: 'Patient Omar Diallo is ready for discharge. Please coordinate the follow-up care.',
+              message_type: 'text',
+              created_at: new Date().toISOString(),
+              read_at: new Date().toISOString()
+            }
+          ],
+          lastMessage: {
+            id: '4',
+            message: 'Patient Omar Diallo is ready for discharge. Please coordinate the follow-up care.',
+            created_at: new Date().toISOString()
+          },
+          unreadCount: 0
+        }
+      ];
 
-      if (error) throw error;
-      setCommunications(data || []);
+      setCommunications(mockCommunications);
+      if (mockCommunications.length > 0) {
+        setSelectedConversation(mockCommunications[0]);
+      }
     } catch (error) {
       console.error('Error fetching communications:', error);
+      setCommunications([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const groupedCommunications = communications.reduce((acc, comm) => {
-    const otherParty = comm.sender_id === profile.id ? comm.recipient : comm.sender;
-    const key = otherParty?.id || 'unknown';
-    
-    if (!acc[key]) {
-      acc[key] = {
-        participant: otherParty,
-        messages: [],
-        lastMessage: null,
-        unreadCount: 0
-      };
-    }
-    
-    acc[key].messages.push(comm);
-    if (!acc[key].lastMessage || new Date(comm.created_at) > new Date(acc[key].lastMessage.created_at)) {
-      acc[key].lastMessage = comm;
-    }
-    
-    if (comm.recipient_id === profile.id && !comm.read_at) {
-      acc[key].unreadCount++;
-    }
-    
-    return acc;
-  }, {});
-
-  const conversations = Object.values(groupedCommunications).sort((a, b) => 
-    new Date(b.lastMessage?.created_at || 0) - new Date(a.lastMessage?.created_at || 0)
-  );
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
       const messageData = {
+        id: Date.now().toString(),
         sender_id: profile.id,
         recipient_id: selectedConversation.participant.id,
         message: newMessage,
         message_type: 'text',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        read_at: null
       };
 
-      const { error } = await supabase
-        .from('communications_healthcare')
-        .insert(messageData);
+      // Add message to the conversation
+      const updatedCommunications = communications.map(comm => {
+        if (comm.id === selectedConversation.id) {
+          return {
+            ...comm,
+            messages: [...comm.messages, messageData],
+            lastMessage: { ...messageData }
+          };
+        }
+        return comm;
+      });
 
-      if (error) throw error;
-
+      setCommunications(updatedCommunications);
+      setSelectedConversation(prev => ({
+        ...prev,
+        messages: [...prev.messages, messageData],
+        lastMessage: { ...messageData }
+      }));
       setNewMessage('');
-      await fetchCommunications();
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -138,14 +192,14 @@ const Communications = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-2 text-sm text-gray-600">Loading...</p>
             </div>
-          ) : conversations.length === 0 ? (
+          ) : communications.length === 0 ? (
             <div className="text-center py-8">
               <SafeIcon icon={FiMessageSquare} className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-600">No conversations</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {conversations.map((conversation, index) => (
+              {communications.map((conversation, index) => (
                 <div
                   key={index}
                   onClick={() => setSelectedConversation(conversation)}
@@ -173,10 +227,9 @@ const Communications = () => {
                       {conversation.participant?.role || 'User'}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {conversation.lastMessage?.created_at 
+                      {conversation.lastMessage?.created_at
                         ? new Date(conversation.lastMessage.created_at).toLocaleDateString()
-                        : ''
-                      }
+                        : ''}
                     </span>
                   </div>
                 </div>
@@ -237,15 +290,9 @@ const Communications = () => {
                             : 'bg-gray-100 text-gray-900'
                         }`}>
                           <div className="flex items-center space-x-2 mb-1">
-                            <SafeIcon 
-                              icon={getMessageTypeIcon(message.message_type)} 
-                              className="w-3 h-3" 
-                            />
+                            <SafeIcon icon={getMessageTypeIcon(message.message_type)} className="w-3 h-3" />
                             {message.priority && (
-                              <SafeIcon 
-                                icon={FiAlertCircle} 
-                                className={`w-3 h-3 ${getPriorityColor(message.priority)}`} 
-                              />
+                              <SafeIcon icon={FiAlertCircle} className={`w-3 h-3 ${getPriorityColor(message.priority)}`} />
                             )}
                           </div>
                           <p className="text-sm">{message.message}</p>

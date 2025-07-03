@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
-import supabase from '../../lib/supabase';
 
 const { FiTrendingUp, FiUsers, FiClock, FiDollarSign, FiMapPin, FiCalendar, FiBarChart3 } = FiIcons;
 
@@ -29,62 +28,28 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      
+      // Using mock data since the database tables don't exist yet
+      const mockAnalytics = {
+        totalJourneys: 45,
+        activeJourneys: 18,
+        completedJourneys: 27,
+        averageDuration: 14,
+        totalRevenue: 485000,
+        patientSatisfaction: 4.8
+      };
 
-      // Calculate date range
-      const now = new Date();
-      let startDate;
-      switch (timeRange) {
-        case 'week':
-          startDate = new Date(now.setDate(now.getDate() - 7));
-          break;
-        case 'month':
-          startDate = new Date(now.setMonth(now.getMonth() - 1));
-          break;
-        case 'quarter':
-          startDate = new Date(now.setMonth(now.getMonth() - 3));
-          break;
-        case 'year':
-          startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-          break;
-        default:
-          startDate = new Date(now.setMonth(now.getMonth() - 1));
-      }
-
-      // Fetch journey data
-      const { data: journeys, error: journeysError } = await supabase
-        .from('patient_journeys_healthcare')
-        .select('*')
-        .gte('created_at', startDate.toISOString());
-
-      if (journeysError) throw journeysError;
-
-      // Fetch payment data
-      const { data: payments, error: paymentsError } = await supabase
-        .from('patient_payments_healthcare')
-        .select('amount, status')
-        .gte('created_at', startDate.toISOString())
-        .eq('status', 'completed');
-
-      if (paymentsError) throw paymentsError;
-
-      // Calculate analytics
-      const totalJourneys = journeys?.length || 0;
-      const activeJourneys = journeys?.filter(j => 
-        ['approved', 'travel_prep', 'in_treatment', 'recovery'].includes(j.status)
-      ).length || 0;
-      const completedJourneys = journeys?.filter(j => j.status === 'completed').length || 0;
-      const totalRevenue = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-
-      setAnalytics({
-        totalJourneys,
-        activeJourneys,
-        completedJourneys,
-        averageDuration: 14, // Mock data
-        totalRevenue,
-        patientSatisfaction: 4.8 // Mock data
-      });
+      setAnalytics(mockAnalytics);
     } catch (error) {
       console.error('Error fetching analytics:', error);
+      setAnalytics({
+        totalJourneys: 0,
+        activeJourneys: 0,
+        completedJourneys: 0,
+        averageDuration: 0,
+        totalRevenue: 0,
+        patientSatisfaction: 0
+      });
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useAuth } from '../../contexts/AuthContext';
 
-const { FiMenu, FiX, FiLogOut, FiUser, FiBell, FiHome, FiUsers, FiCalendar, FiActivity, FiFileText, FiMapPin, FiCreditCard, FiSettings, FiBarChart3, FiMessageSquare, FiTruck, FiUserCheck, FiTrendingUp, FiClipboard, FiFolder, FiHeart, FiShield } = FiIcons;
+const { FiMenu, FiX, FiLogOut, FiUser, FiBell, FiHome, FiUsers, FiCalendar, FiActivity, FiFileText, FiMapPin, FiCreditCard, FiSettings, FiBarChart3, FiMessageSquare, FiTruck, FiUserCheck, FiTrendingUp, FiClipboard, FiFolder, FiHeart, FiShield, FiUserPlus, FiCpu } = FiIcons;
 
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -78,8 +78,10 @@ const DashboardLayout = ({ children }) => {
       return [
         { path: '/dashboard/coordinator', label: 'Overview', icon: FiHome },
         { path: '/dashboard/patient-management', label: 'Patient Management', icon: FiUsers },
+        { path: '/dashboard/patient-assignment', label: 'Patient Assignment', icon: FiUserPlus },
         { path: '/dashboard/journey-tracking', label: 'Journey Tracking', icon: FiMapPin },
         { path: '/dashboard/logistics', label: 'Travel & Logistics', icon: FiTruck },
+        { path: '/dashboard/resource-management', label: 'Resource Management', icon: FiCpu },
         { path: '/dashboard/communications', label: 'Communications', icon: FiMessageSquare },
         { path: '/dashboard/analytics', label: 'Analytics', icon: FiBarChart3 },
         { path: '/dashboard/profile', label: 'Profile', icon: FiUser }

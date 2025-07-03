@@ -11,30 +11,35 @@ import ChatCopilot from '../components/admin/ChatCopilot';
 import WorkflowAutomation from '../components/admin/WorkflowAutomation';
 import UserRoleManagement from '../components/admin/UserRoleManagement';
 import UserProfile from '../components/shared/UserProfile';
+
+// Coordinator Components
 import PatientManagement from '../components/coordinator/PatientManagement';
 import JourneyTracking from '../components/coordinator/JourneyTracking';
 import TravelLogistics from '../components/coordinator/TravelLogistics';
 import Communications from '../components/coordinator/Communications';
 import Analytics from '../components/coordinator/Analytics';
+import PatientAssignment from '../components/coordinator/PatientAssignment';
+import ResourceManagement from '../components/coordinator/ResourceManagement';
+
+// Provider Components
 import MyPatients from '../components/provider/MyPatients';
 import Appointments from '../components/provider/Appointments';
 import Assessments from '../components/provider/Assessments';
 import Treatments from '../components/provider/Treatments';
+
+// Patient Components
 import MedicalHistory from '../components/patient/MedicalHistory';
 import Documents from '../components/patient/Documents';
 import Payments from '../components/patient/Payments';
+
+// Admin Components
 import UserManagement from '../components/admin/UserManagement';
 import SystemAnalytics from '../components/admin/SystemAnalytics';
 
 const DashboardPage = () => {
   const { profile, loading, user, error } = useAuth();
 
-  console.log('🎯 DashboardPage state:', { 
-    user: user?.email, 
-    profile: profile?.role, 
-    loading, 
-    error 
-  });
+  console.log('🎯 DashboardPage state:', { user: user?.email, profile: profile?.role, loading, error });
 
   // Show loading while profile is being fetched
   if (loading) {
@@ -61,7 +66,7 @@ const DashboardPage = () => {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Connection Error</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -127,11 +132,13 @@ const DashboardPage = () => {
         <Route path="/assessments" element={<Assessments />} />
         <Route path="/treatments" element={<Treatments />} />
 
-        {/* Coordinator Routes */}
+        {/* Enhanced Coordinator Routes */}
         <Route path="/coordinator" element={<CoordinatorDashboard />} />
         <Route path="/patient-management" element={<PatientManagement />} />
+        <Route path="/patient-assignment" element={<PatientAssignment />} />
         <Route path="/journey-tracking" element={<JourneyTracking />} />
         <Route path="/logistics" element={<TravelLogistics />} />
+        <Route path="/resource-management" element={<ResourceManagement />} />
         <Route path="/communications" element={<Communications />} />
         <Route path="/analytics" element={<Analytics />} />
 
